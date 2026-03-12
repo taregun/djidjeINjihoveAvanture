@@ -1,4 +1,3 @@
-<!-- Save the first part as: index.html -->
 <!doctype html>
 <html lang="hr">
 <head>
@@ -7,6 +6,9 @@
   <link rel="icon" href="favicon.ico">
   <title>Điđe i njihove avanture!!</title>
   <style>
+    /* reset / helpful defaults */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; overflow-x: hidden; -webkit-text-size-adjust: 100%; }
     :root{
       --card-bg: rgba(255,255,255,0.95);
       --accent: #ff6b9d; /* vibrant pink */
@@ -20,13 +22,11 @@
     }
 
     /* background image with slight blur */
-    html,body{height:100%;margin:0}
     body{
       min-height:100%;
       display:flex;flex-direction:column;
       background: linear-gradient(135deg, #f7f8fb 0%, #e8f0ff 100%);
       color:#0b1328;
-      overflow-x:hidden;
       position:relative;
     }
     body::before{
@@ -35,22 +35,26 @@
       background-image: url('images/20260131_110555.jpg');
       background-size:cover;background-position:center;
       filter: blur(7px) saturate(1.1) brightness(0.95);
-      transform:scale(1.02);
+      transform:scale(1);
       z-index:0;
+      pointer-events:none;
     }
 
     /* main wrapper sits above background */
-    .wrap{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh}
+    .wrap{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh;max-width:100vw;}
 
     header{padding:24px 18px 16px 18px;backdrop-filter: blur(8px);background:rgba(255,255,255,0.4);}
-    .title-box{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:14px;width:100%}
+    .title-box{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:14px;width:100%;min-width:0;}
     h1{font-size:24px;margin:0;padding:12px 18px;border-radius:var(--radius);background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white;box-shadow:var(--shadow-lg);font-weight:800;letter-spacing:-0.5px}
     .subtitle{font-size:13px;margin-left:4px;opacity:0.9;font-style:italic;color:#0b1328}
 
-    main{flex:1;padding:18px;max-width:1100px;margin:8px auto 24px auto;width:100%}
+    main{flex:1;padding:18px;max-width:1100px;margin:8px auto 24px auto;width:100%;min-width:0;}
 
-    /* events grid */
-    .events{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+    /* events grid
+       reduce the min column width so narrow phones won't force horizontal scrolling,
+       and ensure grid children are allowed to shrink (min-width:0) */
+    .events{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px; width:100%;}
+    .card{min-width:0;} /* allow shrinking */
 
     .card{
       background:var(--card-bg);
@@ -67,12 +71,14 @@
       border-color:var(--accent);
     }
 
+    /* keep img responsive and prevent it from forcing width */
     .card img{
       width:100%;
       height:160px;
       object-fit:cover;
       display:block;
       transition:transform .25s ease;
+      max-width:100%;
     }
     .card:hover img{
       transform:scale(1.06);
@@ -83,6 +89,7 @@
       flex-direction:column;
       gap:10px;
       flex:1;
+      min-width:0; /* important for flex children */
     }
     .event-title{
       font-weight:800;
@@ -99,6 +106,8 @@
       margin:0;
       line-height:1.5;
       flex:1;
+      min-width:0;
+      word-break:break-word;
     }
 
     /* small badge style */
@@ -137,17 +146,19 @@
     }
 
     /* small visual flourish */
-    .top-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
-    .search-like{display:flex;gap:8px;align-items:center}
+    .top-row{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:100%;}
+    .search-like{display:flex;gap:8px;align-items:center;flex:1;min-width:0;}
     .search-like input{
       padding:11px 16px;
       border-radius:999px;
       border:2px solid rgba(255,255,255,0.5);
       box-shadow:0 4px 12px rgba(0,0,0,0.08);
-      min-width:140px;
+      min-width:0;
       font-size:14px;
       transition:all .25s ease;
       background:rgba(255,255,255,0.85);
+      max-width:100%;
+      width:100%;
     }
     .search-like input:focus{
       outline:none;
@@ -185,6 +196,7 @@
       align-items:center;
       justify-content:center;
       padding:20px;
+      overflow:auto;
     }
     .modal.active{
       display:flex;
@@ -209,9 +221,10 @@
     }
     .modal img.zoomed{
       cursor:zoom-out;
+      transform: none;
+      width:auto;
       max-width:none;
       max-height:none;
-      width:200%;
     }
     .modal-close{
       position:absolute;
@@ -244,15 +257,9 @@
       max-width:90vw;
       width:100%;
     }
-    .modal-info h2{
-      margin:0 0 8px 0;
-      font-size:18px;
-    }
-    .modal-info p{
-      margin:0;
-      font-size:14px;
-      opacity:0.9;
-    }
+    .modal-info h2{ margin:0 0 8px 0; font-size:18px;}
+    .modal-info p{ margin:0; font-size:14px; opacity:0.9;}
+
   </style>
 </head>
 <body>
@@ -280,8 +287,8 @@
   </div>
 
   <!-- Image Modal -->
-  <div id="imageModal" class="modal">
-    <div class="modal-close" onclick="closeModal()">&times;</div>
+  <div id="imageModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-close" onclick="closeModal()" aria-label="Zatvori">&times;</div>
     <div class="modal-content">
       <img id="modalImage" alt="Event image" onclick="toggleZoom(event)">
       <div class="modal-info">
@@ -378,18 +385,20 @@
       const modalImg = document.getElementById('modalImage');
       const modalTitle = document.getElementById('modalTitle');
       const modalText = document.getElementById('modalText');
-      
+
+      modal.setAttribute('aria-hidden', 'false');
       modalImg.src = event.image;
       modalImg.classList.remove('zoomed');
       modalTitle.textContent = event.title;
       modalText.textContent = event.text;
-      
+
       modal.classList.add('active');
     }
 
     function closeModal(){
       const modal = document.getElementById('imageModal');
       modal.classList.remove('active');
+      modal.setAttribute('aria-hidden', 'true');
       document.getElementById('modalImage').classList.remove('zoomed');
     }
 
@@ -426,5 +435,3 @@
   </script>
 </body>
 </html>
-
-
