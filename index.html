@@ -1,0 +1,430 @@
+<!-- Save the first part as: index.html -->
+<!doctype html>
+<html lang="hr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="favicon.ico">
+  <title>Điđe i njihove avanture!!</title>
+  <style>
+    :root{
+      --card-bg: rgba(255,255,255,0.95);
+      --accent: #ff6b9d; /* vibrant pink */
+      --accent-2: #ffa500; /* vibrant orange */
+      --accent-3: #00d4ff; /* cyan accent */
+      --glass: rgba(255,255,255,0.8);
+      --radius: 16px;
+      --shadow: 0 8px 24px rgba(11,20,40,0.18);
+      --shadow-lg: 0 12px 32px rgba(11,20,40,0.24);
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+
+    /* background image with slight blur */
+    html,body{height:100%;margin:0}
+    body{
+      min-height:100%;
+      display:flex;flex-direction:column;
+      background: linear-gradient(135deg, #f7f8fb 0%, #e8f0ff 100%);
+      color:#0b1328;
+      overflow-x:hidden;
+      position:relative;
+    }
+    body::before{
+      content:'';
+      position:fixed;inset:0;
+      background-image: url('images/20260131_110555.jpg');
+      background-size:cover;background-position:center;
+      filter: blur(7px) saturate(1.1) brightness(0.95);
+      transform:scale(1.02);
+      z-index:0;
+    }
+
+    /* main wrapper sits above background */
+    .wrap{position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh}
+
+    header{padding:24px 18px 16px 18px;backdrop-filter: blur(8px);background:rgba(255,255,255,0.4);}
+    .title-box{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:14px;width:100%}
+    h1{font-size:24px;margin:0;padding:12px 18px;border-radius:var(--radius);background:linear-gradient(135deg,var(--accent),var(--accent-2));color:white;box-shadow:var(--shadow-lg);font-weight:800;letter-spacing:-0.5px}
+    .subtitle{font-size:13px;margin-left:4px;opacity:0.9;font-style:italic;color:#0b1328}
+
+    main{flex:1;padding:18px;max-width:1100px;margin:8px auto 24px auto;width:100%}
+
+    /* events grid */
+    .events{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+
+    .card{
+      background:var(--card-bg);
+      border-radius:var(--radius);
+      overflow:hidden;box-shadow:var(--shadow);
+      display:flex;flex-direction:column;
+      transition:all .25s cubic-bezier(0.4,0,0.2,1);
+      min-height:160px;
+      border:2px solid rgba(255,255,255,0.6);
+    }
+    .card:hover{
+      transform:translateY(-8px) scale(1.02);
+      box-shadow:var(--shadow-lg);
+      border-color:var(--accent);
+    }
+
+    .card img{
+      width:100%;
+      height:160px;
+      object-fit:cover;
+      display:block;
+      transition:transform .25s ease;
+    }
+    .card:hover img{
+      transform:scale(1.06);
+    }
+    .card-content{
+      padding:14px 16px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      flex:1;
+    }
+    .event-title{
+      font-weight:800;
+      font-size:17px;
+      margin:0;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .event-text{
+      font-size:14px;
+      color:#455a64;
+      margin:0;
+      line-height:1.5;
+      flex:1;
+    }
+
+    /* small badge style */
+    .badge{
+      display:inline-block;
+      padding:8px 14px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      background:linear-gradient(135deg, var(--accent), var(--accent-2));
+      color:white;
+      box-shadow:0 4px 12px rgba(255,107,157,0.3);
+      text-transform:uppercase;
+      letter-spacing:0.5px;
+    }
+
+    /* footer */
+    footer{
+      padding:16px 18px;
+      text-align:center;
+      font-size:13px;
+      color:#0b1328;
+      opacity:0.9;
+      font-weight:500;
+      background:rgba(255,255,255,0.3);
+      backdrop-filter:blur(4px);
+    }
+
+    /* responsive tweaks for phone */
+    @media (max-width:480px){
+      h1{font-size:18px;padding:10px 14px}
+      .card img{height:140px}
+      .event-title{font-size:15px}
+      main{padding:12px}
+      header{padding:12px}
+    }
+
+    /* small visual flourish */
+    .top-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .search-like{display:flex;gap:8px;align-items:center}
+    .search-like input{
+      padding:11px 16px;
+      border-radius:999px;
+      border:2px solid rgba(255,255,255,0.5);
+      box-shadow:0 4px 12px rgba(0,0,0,0.08);
+      min-width:140px;
+      font-size:14px;
+      transition:all .25s ease;
+      background:rgba(255,255,255,0.85);
+    }
+    .search-like input:focus{
+      outline:none;
+      border-color:var(--accent);
+      box-shadow:0 4px 16px rgba(255,107,157,0.25);
+      background:rgba(255,255,255,0.95);
+    }
+    .search-like input::placeholder{
+      color:#999;
+    }
+
+    /* placeholder when no events */
+    .empty{
+      padding:40px 28px;
+      border-radius:var(--radius);
+      background:linear-gradient(180deg,rgba(255,255,255,0.85),rgba(255,255,255,0.95));
+      text-align:center;
+      color:#666;
+      font-size:15px;
+      min-height:200px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:500;
+    }
+
+    /* modal styles */
+    .modal{
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(11,20,40,0.9);
+      z-index:100;
+      backdrop-filter:blur(8px);
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+    }
+    .modal.active{
+      display:flex;
+    }
+    .modal-content{
+      position:relative;
+      width:100%;
+      max-width:90vw;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:16px;
+    }
+    .modal img{
+      max-width:100%;
+      max-height:70vh;
+      cursor:zoom-in;
+      transition:transform .15s ease;
+      border-radius:var(--radius);
+      box-shadow:0 20px 60px rgba(0,0,0,0.5);
+    }
+    .modal img.zoomed{
+      cursor:zoom-out;
+      max-width:none;
+      max-height:none;
+      width:200%;
+    }
+    .modal-close{
+      position:absolute;
+      top:20px;
+      right:20px;
+      width:48px;
+      height:48px;
+      background:rgba(255,255,255,0.2);
+      border:2px solid white;
+      border-radius:50%;
+      color:white;
+      font-size:28px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:all .25s ease;
+      z-index:101;
+    }
+    .modal-close:hover{
+      background:rgba(255,255,255,0.4);
+      transform:scale(1.1);
+    }
+    .modal-info{
+      background:rgba(0,0,0,0.6);
+      color:white;
+      padding:16px;
+      border-radius:var(--radius);
+      backdrop-filter:blur(8px);
+      max-width:90vw;
+      width:100%;
+    }
+    .modal-info h2{
+      margin:0 0 8px 0;
+      font-size:18px;
+    }
+    .modal-info p{
+      margin:0;
+      font-size:14px;
+      opacity:0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title-box">
+        <h1>Điđe i njihove avanture!!</h1>
+        <div class="subtitle">Vikent ko' babe!!!</div>
+      </div>
+    </header>
+
+    <main>
+      <div class="top-row" style="margin-bottom:12px;">
+        <div class="search-like" style="flex:1;">
+          <input id="filter" placeholder="Pretraži avanture..." aria-label="pretraga" />
+        </div>
+      </div>
+
+      <div id="events" class="events" aria-live="polite">
+        <div class="empty">Učitavanje avantura...</div>
+      </div>
+    </main>
+
+    <footer>Tarik Ganić</footer>
+  </div>
+
+  <!-- Image Modal -->
+  <div id="imageModal" class="modal">
+    <div class="modal-close" onclick="closeModal()">&times;</div>
+    <div class="modal-content">
+      <img id="modalImage" alt="Event image" onclick="toggleZoom(event)">
+      <div class="modal-info">
+        <h2 id="modalTitle"></h2>
+        <p id="modalText"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Events data embedded directly in HTML
+    const eventsData = [
+      {
+        "image": "images/20260131_104103.jpg",
+        "title": "Ja dobre kafe!",
+        "text": "U lidlu u Makarskoj ima neka njemačka ledena kafa, jest dobra brate... :)"
+      },
+      {
+        "image": "images/20260131_110555.jpg",
+        "title": "More!!!!!",
+        "text": "Stigosmo mi vala, ja mora plavog u januar mjesecu XD"
+      },
+      {
+        "image": "images/20260131_142017.jpg",
+        "title": "Crno-bjelo",
+        "text": "Sa nama nema zajebancije"
+      },
+      {
+        "image": "images/20260131_120133.jpg",
+        "title": "Na balkonu",
+        "text": "Pazi bolan ne bio, ispašćeti XDs"
+      },
+      {
+        "image": "images/20260131_123056.jpg",
+        "title": "Babo kod mora",
+        "text": "Au al si opasan u jakni..."
+      },
+      {
+        "image": "images/viber_image_2026-03-12_21-13-30-020.jpg",
+        "title": "Lazanje kod babe",
+        "text": "Kad će ovo mama znat napravit?"
+      },
+      {
+        "image": "images/images.jpg",
+        "title": "Darling, trili frili",
+        "text": "longson, tumoro gona longsong..."
+      }
+    ];
+
+    function renderEvents(list){
+      const container = document.getElementById('events');
+      container.innerHTML = '';
+      if(!list.length){
+        container.innerHTML = '<div class="empty">Nema dostupnih avantura.</div>';
+        return;
+      }
+
+      list.forEach(ev => {
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.style.cursor = 'pointer';
+
+        const img = document.createElement('img');
+        img.src = ev.image || 'images/placeholder.jpg';
+        img.alt = ev.title || 'slika avanture';
+        img.loading = 'lazy';
+
+        const content = document.createElement('div');
+        content.className = 'card-content';
+
+        const title = document.createElement('h3');
+        title.className = 'event-title';
+        title.textContent = ev.title || 'Bez naslova';
+
+        const text = document.createElement('p');
+        text.className = 'event-text';
+        text.textContent = ev.text || '';
+
+        content.appendChild(title);
+        content.appendChild(text);
+
+        card.appendChild(img);
+        card.appendChild(content);
+
+        // Click handler to open modal
+        card.addEventListener('click', () => openModal(ev));
+
+        container.appendChild(card);
+      });
+    }
+
+    function openModal(event){
+      const modal = document.getElementById('imageModal');
+      const modalImg = document.getElementById('modalImage');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalText = document.getElementById('modalText');
+      
+      modalImg.src = event.image;
+      modalImg.classList.remove('zoomed');
+      modalTitle.textContent = event.title;
+      modalText.textContent = event.text;
+      
+      modal.classList.add('active');
+    }
+
+    function closeModal(){
+      const modal = document.getElementById('imageModal');
+      modal.classList.remove('active');
+      document.getElementById('modalImage').classList.remove('zoomed');
+    }
+
+    function toggleZoom(e){
+      e.stopPropagation();
+      const img = document.getElementById('modalImage');
+      img.classList.toggle('zoomed');
+    }
+
+    // Close modal when clicking background
+    document.getElementById('imageModal').addEventListener('click', (e) => {
+      if(e.target.id === 'imageModal') closeModal();
+    });
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape') closeModal();
+    });
+
+    // simple filter
+    document.getElementById('filter').addEventListener('input', (e)=>{
+      const q = e.target.value.trim().toLowerCase();
+      const cards = Array.from(document.querySelectorAll('.card'));
+      if(!q){ cards.forEach(c=>c.style.display='flex'); return }
+      cards.forEach(c=>{
+        const title = c.querySelector('.event-title')?.textContent.toLowerCase()||'';
+        const text = c.querySelector('.event-text')?.textContent.toLowerCase()||'';
+        c.style.display = (title.includes(q) || text.includes(q)) ? 'flex' : 'none';
+      })
+    });
+
+    // Load and render events
+    renderEvents(eventsData);
+  </script>
+</body>
+</html>
+
+
